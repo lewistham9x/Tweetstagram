@@ -34,7 +34,7 @@ export class ProfileGalleryComponent implements OnInit {
 			.subscribe(
 				(res: any) => {
 					console.log(res);
-					this.posts = res;
+					this.posts = res.tweets;
 				},
 				err => {
 					console.log(err);

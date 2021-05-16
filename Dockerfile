@@ -1,5 +1,7 @@
-FROM node:12-alpine
+# Build
+FROM node:12-alpine as build-step
 
+RUN mkdir -p /app
 # set working directory
 WORKDIR /app
 
@@ -14,5 +16,14 @@ RUN npm install -g @nrwl/cli
 # add app
 COPY . /app
 
-# start app
-CMD ["npm", "start"]
+RUN npm run build --prod
+
+ENV PROXY_USER "User"
+ENV PROXY_USER "Pass"
+
+# Run
+FROM nginx:1.17.1-alpine
+
+COPY --from=build-step /app/dist/apps/frontend /usr/share/nginx/html
+
+EXPOSE 80

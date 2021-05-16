@@ -1,0 +1,3 @@
+git+https://github.com/lewistham9x/twint.git
+flask
+flask-cors

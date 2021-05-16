@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+    backend:
+        build:
+            context: ./apps/backend/
+            dockerfile: Dockerfile
+        tty: true
+        restart: unless-stopped
+        ports:
+            - 5000:5000
+        environment:
+            - PROXY_USER="User"
+            - PROXY_USER="Pass"
+    frontend:
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        tty: true
+        restart: unless-stopped
+        ports:
+            - 80:80

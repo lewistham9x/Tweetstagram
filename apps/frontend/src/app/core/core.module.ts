@@ -5,12 +5,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
-import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
-import FilePondPluginImageCrop from 'filepond-plugin-image-crop';
-import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
-import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
-import FilePondPluginImageTransform from 'filepond-plugin-image-transform';
-import { FilePondModule, registerPlugin } from 'ngx-filepond';
 import { LoaderComponent } from './components/loader/loader.component';
 import { LoaderService } from './components/loader/loader.service';
 import { NotificationComponent } from './components/notification/notification.component';
@@ -21,14 +15,6 @@ import { InterceptorService } from './services/interceptor.service';
 
 library.add(fas);
 
-registerPlugin(
-	FilePondPluginFileValidateType,
-	FilePondPluginImagePreview,
-	FilePondPluginImageExifOrientation,
-	FilePondPluginImageCrop,
-	FilePondPluginImageTransform
-);
-
 @NgModule({
 	declarations: [LoaderComponent, NotificationComponent],
 	imports: [
@@ -36,8 +22,7 @@ registerPlugin(
 		HttpClientModule,
 		FormsModule,
 		ReactiveFormsModule,
-		FontAwesomeModule,
-		FilePondModule
+		FontAwesomeModule
 	],
 	providers: [
 		{
@@ -55,8 +40,7 @@ registerPlugin(
 		NotificationComponent,
 		FormsModule,
 		ReactiveFormsModule,
-		FontAwesomeModule,
-		FilePondModule
+		FontAwesomeModule
 	]
 })
 export class CoreModule {}
