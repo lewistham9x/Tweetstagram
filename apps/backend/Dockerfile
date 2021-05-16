@@ -1,4 +1,4 @@
-FROM python:3.6-slim-buster
+FROM python:3.8-slim-buster
 
 WORKDIR /code
 
@@ -21,5 +21,8 @@ COPY . .
 
 EXPOSE 5000
 
-CMD [ "python3","-u","server.py"]
+RUN pip3 install gunicorn
+RUN chmod +x ./gunicorn.sh
+
+CMD [ "./gunicorn.sh"]
 

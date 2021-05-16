@@ -10,8 +10,8 @@ services:
         ports:
             - 5000:5000
         environment:
-            - PROXY_USER="User"
-            - PROXY_USER="Pass"
+            - PROXY_USER=user
+            - PROXY_PASS=pass
     frontend:
         build:
             context: ./
@@ -19,4 +19,4 @@ services:
         tty: true
         restart: unless-stopped
         ports:
-            - 80:80
+            - 6942:80

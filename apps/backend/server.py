@@ -5,24 +5,30 @@ from flask_cors import CORS, cross_origin
 import os
 
 app = Flask(__name__)
-
-cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 proxyuser = os.environ['PROXY_USER']
 proxypass = os.environ['PROXY_PASS']
 
+print('proxyuser', proxyuser)
+print('proxypass', proxypass)
+
 @app.route("/")
+@cross_origin(origin='*')
 def index():
     return "Hello World!"
 
 @app.route('/profile/<username>', methods=['GET'])
+@cross_origin(origin='*')
 def getUserProfile(username):
 	return {
 		"username": str(username)
 	}
 
 @app.route('/profile/<username>/Posts', methods=['GET'])
+@cross_origin(origin='*')
 def getUserTweets(username):
 	# Configure
 	c = twint.Config()
@@ -51,5 +57,3 @@ def getUserTweets(username):
 		"userid": str(userid),
 		"tweets": tweets
 	}
-
-app.run()
