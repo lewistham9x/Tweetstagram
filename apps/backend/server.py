@@ -43,8 +43,10 @@ def getUserProfile(username):
 @cross_origin(origin='*')
 def getUserPosts(username):
     if not os.path.exists(datafolder+username):
-        with open(datafolder+username, 'rb') as f:
+        with open(datafolder+username.lower()+".json", 'rb') as f:
             tweets = json.load(f)
+
+            print("Accessing from cache")
 
         return {
             "username": str(username),
@@ -54,7 +56,7 @@ def getUserPosts(username):
     else:
         response = initialScrape(username)
 
-        with open(datafolder+username, 'w') as outfile:
+        with open(datafolder+username.lower()+".json", 'w') as outfile:
             json.dump(response, outfile)
 
         return response
