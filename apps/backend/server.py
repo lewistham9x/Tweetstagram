@@ -42,7 +42,7 @@ def getUserProfile(username):
 @app.route('/profile/<username>/Posts', methods=['GET'])
 @cross_origin(origin='*')
 def getUserPosts(username):
-    if not os.path.exists(datafolder+username):
+    if os.path.exists(datafolder+username.lower()+".json"):
         with open(datafolder+username.lower()+".json", 'rb') as f:
             tweets = json.load(f)
 

@@ -18,11 +18,13 @@ RUN apt-get install -y tzdata
 
 RUN dpkg-reconfigure -f noninteractive tzdata
 
-COPY . .
-
 EXPOSE 5000
 
 RUN pip3 install gunicorn
+
+COPY . .
+
+
 RUN chmod +x ./gunicorn.sh
 
 CMD [ "./gunicorn.sh"]
