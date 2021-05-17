@@ -12,8 +12,18 @@ services:
         environment:
             - PROXY_USER=user
             - PROXY_PASS=pass
+            - BASE_URL=api.twgm.miim.club
         volumes:
             - ./static:/code/static
+        labels:
+            - traefik.enable=true
+            - traefik.backend=backend
+            - traefik.frontend.rule=Host:api.twgm.miim.club
+            - traefik.docker.network=proxy
+            - traefik.port=5000
+        networks:
+            - proxy
+
     frontend:
         build:
             context: ./
@@ -22,3 +32,14 @@ services:
         restart: unless-stopped
         ports:
             - 6942:80
+        labels:
+            - traefik.enable=true
+            - traefik.backend=backend
+            - traefik.frontend.rule=Host:twgm.miim.club
+            - traefik.docker.network=proxy
+            - traefik.port=80
+        networks:
+            - proxy
+networks:
+    proxy:
+        external: true
