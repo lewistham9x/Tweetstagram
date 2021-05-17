@@ -5,6 +5,7 @@ from flask_cors import CORS, cross_origin
 import os
 import requests
 import shutil
+import json
 
 app = Flask(__name__)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -16,9 +17,12 @@ proxypass = os.environ['PROXY_PASS']
 baseurl = os.environ['BASE_URL']+"/"
 
 imagefolder = "static/images/"
+datafolder = "static/data/"
 
 if not os.path.exists(imagefolder):
     os.makedirs(imagefolder)
+if not os.path.exists(datafolder):
+    os.makedirs(datafolder)
 
 
 @app.route("/")
@@ -37,7 +41,26 @@ def getUserProfile(username):
 
 @app.route('/profile/<username>/Posts', methods=['GET'])
 @cross_origin(origin='*')
-def getUserTweets(username):
+def getUserPosts(username):
+    if not os.path.exists(datafolder+username):
+        with open(datafolder+username, 'wb') as f:
+            tweets = json.load(f)
+
+        return {
+            "username": str(username),
+            "tweets": tweets
+        }
+
+    else:
+        response = initialScrape(username)
+
+        with open(datafolder+username, 'w') as outfile:
+            json.dump(response, outfile)
+
+        return response
+
+
+def initialScrape(username):
     # Configure
     c = twint.Config()
     c.Username = username
@@ -54,7 +77,7 @@ def getUserTweets(username):
     df = twint.storage.panda.Tweets_df
 
     username = df["username"][0]
-    userid = df["user_id"][0]
+    # userid = df["user_id"][0]
 
     tweets = []
 
@@ -78,6 +101,5 @@ def getUserTweets(username):
 
     return {
         "username": str(username),
-        "userid": str(userid),
         "tweets": tweets
     }
