@@ -48,10 +48,7 @@ def getUserPosts(username):
 
             print("Accessing from cache")
 
-        return {
-            "username": str(username),
-            "tweets": tweets
-        }
+        return tweets
 
     else:
         response = initialScrape(username)
