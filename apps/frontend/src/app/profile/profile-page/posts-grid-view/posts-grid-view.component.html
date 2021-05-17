@@ -1,6 +1,6 @@
 <div class="columns" *ngIf="posts?.length">
 	<div class="column is-4" *ngFor="let item of posts">
-		<img [src]="(item?.photos)[0]" />
+		<img [src]="{{environment.BASE_URL}}+(item?.photos)[0]" />
 	</div>
 </div>
 

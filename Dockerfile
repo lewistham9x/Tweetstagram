@@ -16,7 +16,7 @@ RUN npm install -g @nrwl/cli
 # add app
 COPY . /app
 
-RUN npm run build --prod
+RUN npm run build --prod --aot=true
 
 ENV PROXY_USER "User"
 ENV PROXY_USER "Pass"
