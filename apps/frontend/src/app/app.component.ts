@@ -13,7 +13,7 @@ import {
 import { SwUpdate } from '@angular/service-worker';
 import { LoaderService } from './core/components/loader/loader.service';
 import { AuthService } from './core/services/auth/auth.service';
-
+import { environment } from '../environments/environment';
 @Component({
 	selector: 'ia-root',
 	templateUrl: './app.component.html',
