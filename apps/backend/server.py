@@ -3,6 +3,8 @@ import twint
 from flask import Flask
 from flask_cors import CORS, cross_origin
 import os
+import requests
+import shutil
 
 app = Flask(__name__)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -12,8 +14,10 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 proxyuser = os.environ['PROXY_USER']
 proxypass = os.environ['PROXY_PASS']
 
-print('proxyuser', proxyuser)
-print('proxypass', proxypass)
+imagefolder = "static/images/"
+
+if not os.path.exists(imagefolder):
+	os.makedirs(imagefolder)
 
 @app.route("/")
 @cross_origin(origin='*')
@@ -49,8 +53,22 @@ def getUserTweets(username):
 	userid = df["user_id"][0]
 
 	tweets = []
+
 	for index, row in df.iterrows():
-		tweets.append({"id": str(row["id"]), "created_at": str(row["created_at"]), "tweet": row["tweet"], "photos":row["photos"]})
+		photos = []
+		for photo in row["photos"]:
+			r = requests.get(photo,stream=True)
+			# Set decode_content value to True, otherwise the downloaded image file's size will be zero.
+			r.raw.decode_content = True# Open a local file with wb ( write binary ) permission.
+			url = photo.split("/")[-1]
+
+			if not os.path.exists(imagefolder+url):
+				with open(imagefolder+url,'wb') as f:
+					shutil.copyfileobj(r.raw, f)
+
+			photos.append(imagefolder+url)
+
+		tweets.append({"id": str(row["id"]), "created_at": str(row["created_at"]), "tweet": row["tweet"], "photos":photos})
 
 	return {
 		"username": str(username),

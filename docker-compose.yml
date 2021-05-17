@@ -12,6 +12,8 @@ services:
         environment:
             - PROXY_USER=user
             - PROXY_PASS=pass
+        volumes:
+            - ./static:/code/static
     frontend:
         build:
             context: ./

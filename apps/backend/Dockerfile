@@ -4,6 +4,7 @@ WORKDIR /code
 
 COPY requirements.txt .
 
+RUN apt-get clean -y
 RUN apt-get update -y
 
 RUN apt-get install -y git
