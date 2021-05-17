@@ -16,7 +16,7 @@ RUN npm install -g @nrwl/cli
 # add app
 COPY . /app
 
-RUN npm run build --prod --aot=true
+RUN npm run ng build -- --configuration=production
 
 ENV PROXY_USER "User"
 ENV PROXY_USER "Pass"

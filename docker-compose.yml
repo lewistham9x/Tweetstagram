@@ -34,7 +34,7 @@ services:
             - 6942:80
         labels:
             - traefik.enable=true
-            - traefik.backend=backend
+            - traefik.backend=frontend
             - traefik.frontend.rule=Host:twgm.miim.club
             - traefik.docker.network=proxy
             - traefik.port=80

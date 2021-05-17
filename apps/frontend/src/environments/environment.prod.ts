@@ -1,4 +1,4 @@
 export const environment = {
 	production: true,
-	BASE_URL: 'http://192.168.1.35:5000/'
+	BASE_URL: 'https://api.twgm.miim.club/'
 };
