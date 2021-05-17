@@ -43,7 +43,7 @@ def getUserProfile(username):
 @cross_origin(origin='*')
 def getUserPosts(username):
     if not os.path.exists(datafolder+username):
-        with open(datafolder+username, 'wb') as f:
+        with open(datafolder+username, 'rb') as f:
             tweets = json.load(f)
 
         return {
