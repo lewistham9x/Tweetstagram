@@ -20,7 +20,9 @@ export class ProfileGalleryComponent implements OnInit {
 	bookmark = faBookmark;
 	index = 0;
 	interval = 10;
-	padding = 1000; // padding before load
+	padding = 100; // padding before load
+	isLoading = false; // if its loading
+	isEnd = false; // if its loading
 
 	constructor(private httpService: HttpService, private router: Router) {}
 
@@ -39,8 +41,6 @@ export class ProfileGalleryComponent implements OnInit {
 			window.innerHeight + n >=
 			document.body.scrollHeight - this.padding
 		) {
-			console.log('Loading more...');
-			this.index = this.index + 1;
 			this.getPosts();
 		}
 	};
@@ -48,20 +48,33 @@ export class ProfileGalleryComponent implements OnInit {
 	getPosts() {
 		const url: string = this.router.url;
 		const username: string = url.split('/')[1];
-		this.httpService
-			.get(
-				`profile/${username}/Posts?start=${this.index}&end=${
-					this.index + this.interval
-				}`
-			)
-			.subscribe(
-				(res: any) => {
-					console.log(res);
-					this.posts = this.posts.concat(res.tweets);
-				},
-				(err) => {
-					console.log(err);
-				}
-			);
+		console.log(this.index);
+		console.log(this.index * this.interval);
+		console.log(this.index * this.interval + this.interval);
+		if (!this.isLoading && !this.isEnd) {
+			console.log('Loading more...');
+			this.isLoading = true;
+			this.httpService
+				.get(
+					`profile/${username}/Posts?start=${
+						this.index * this.interval
+					}&end=${this.index * this.interval + this.interval}`
+				)
+				.subscribe(
+					(res: any) => {
+						console.log(res);
+						this.posts = this.posts.concat(res.tweets);
+						this.isLoading = false;
+						if (res.tweets.length === 0) {
+							console.log('Ended!');
+							this.isEnd = true;
+						}
+					},
+					(err) => {
+						console.log(err);
+					}
+				);
+			this.index = this.index + 1;
+		}
 	}
 }
