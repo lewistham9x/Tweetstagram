@@ -23,7 +23,17 @@ export class ProfileGalleryComponent implements OnInit {
 
 	ngOnInit() {
 		this.tabToggle(this.isSelectedTab);
+		window.addEventListener('scroll', this.scrollEvent, true);
 	}
+
+	ngOnDestroy() {
+		window.removeEventListener('scroll', this.scrollEvent, true);
+	}
+
+	scrollEvent = (event: any): void => {
+		const n = event.srcElement.scrollingElement.scrollTop;
+		console.log(n);
+	};
 
 	tabToggle(tabItem) {
 		const url: string = this.router.url;

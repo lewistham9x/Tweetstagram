@@ -1,6 +1,6 @@
 import twint
 
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS, cross_origin
 import os
 import requests
@@ -44,11 +44,9 @@ def getUserProfile(username):
 def getUserPosts(username):
     if os.path.exists(datafolder+username.lower()+".json"):
         with open(datafolder+username.lower()+".json", 'rb') as f:
-            tweets = json.load(f)
+            response = json.load(f)
 
             print("Accessing from cache")
-
-        return tweets
 
     else:
         response = initialScrape(username)
@@ -56,7 +54,27 @@ def getUserPosts(username):
         with open(datafolder+username.lower()+".json", 'w') as outfile:
             json.dump(response, outfile)
 
-        return response
+    start = request.args.get('start')
+    end = request.args.get('end')
+
+    if start == None:
+        start = 0
+
+    if end == None:
+        end = len(response['tweets'])
+
+    if start > end:
+        start = end
+
+    if start > len(response['tweets']):
+        start = len(response['tweets'])
+
+    if end > len(response['tweets']):
+        end = len(response['tweets'])
+
+    response['tweets'] = response['tweets'][start:end]
+
+    return response
 
 
 def initialScrape(username):
@@ -70,8 +88,13 @@ def initialScrape(username):
     c.Proxy_Password = proxypass
     c.Images = True
     c.Pandas = True
+    c.Hide_output
     # Run
+    print("Scraping from twitter...")
+
     twint.run.Search(c)
+
+    print("Scraped!")
 
     df = twint.storage.panda.Tweets_df
 
