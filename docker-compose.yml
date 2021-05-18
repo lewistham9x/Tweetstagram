@@ -10,15 +10,15 @@ services:
         ports:
             - 5000:5000
         environment:
-            - PROXY_USER=user
-            - PROXY_PASS=pass
-            - BASE_URL=api.twgm.miim.club
+            - PROXY_USER=User
+            - PROXY_PASS=Pass
+            - BASE_URL=https://api.twig.miim.club
         volumes:
             - ./static:/code/static
         labels:
             - traefik.enable=true
             - traefik.backend=backend
-            - traefik.frontend.rule=Host:api.twgm.miim.club
+            - traefik.frontend.rule=Host:api.twig.miim.club
             - traefik.docker.network=proxy
             - traefik.port=5000
         networks:
@@ -35,7 +35,7 @@ services:
         labels:
             - traefik.enable=true
             - traefik.backend=frontend
-            - traefik.frontend.rule=Host:twgm.miim.club
+            - traefik.frontend.rule=Host:twig.miim.club
             - traefik.docker.network=proxy
             - traefik.port=80
         networks:

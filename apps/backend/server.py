@@ -54,8 +54,8 @@ def getUserPosts(username):
         with open(datafolder+username.lower()+".json", 'w') as outfile:
             json.dump(response, outfile)
 
-    start = request.args.get('start')
-    end = request.args.get('end')
+    start = int(request.args.get('start'))
+    end = int(request.args.get('end'))
 
     if start == None:
         start = 0
@@ -66,13 +66,13 @@ def getUserPosts(username):
     if start > end:
         start = end
 
-    if start > len(response['tweets']):
-        start = len(response['tweets'])
-
     if end > len(response['tweets']):
         end = len(response['tweets'])
 
     response['tweets'] = response['tweets'][start:end]
+
+    if start > len(response['tweets']):
+        response['tweets'] = []
 
     return response
 
