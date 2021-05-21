@@ -69,12 +69,13 @@ export class ProfileGalleryComponent implements OnInit {
 							console.log('Ended!');
 							this.isEnd = true;
 						}
+						this.index = this.index + 1;
 					},
 					(err) => {
 						console.log(err);
+						this.isLoading = false;
 					}
 				);
-			this.index = this.index + 1;
 		}
 	}
 }

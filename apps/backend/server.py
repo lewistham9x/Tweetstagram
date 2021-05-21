@@ -46,31 +46,37 @@ def getUserProfile(username):
 @app.route('/profile/<username>/Posts', methods=['GET'])
 @cross_origin(origin='*')
 def getUserPosts(username):
+    firstscrape = False
+    start = request.args.get('start')
+    end = request.args.get('end')
+    if start == None:
+        start = 0
+    else:
+        start = int(start)
+
     if os.path.exists(datafolder+username.lower()+".json"):
         with open(datafolder+username.lower()+".json", 'rb') as f:
             response = json.load(f)
-
             print("Accessing from cache")
 
+            if start == 0:  # if its the first few tweets, check and update
+                p = Process(target=checkAndUpdate, args=(
+                    username.lower(), response,))
+                p.start()
     else:
         p = Process(target=initialBackgroundScrape, args=(username.lower(),))
         p.start()
 
-        response = scrape(username.lower(), full=False)
+        response = scrape(username.lower(), limit=10)
         print("Got tweets!")
+
+        firstscrape = True
 
         if not os.path.exists(datafolder+username.lower()+".json"):
             with open(datafolder+username.lower()+".json", 'w') as outfile:
                 json.dump(response, outfile)
 
-    start = request.args.get('start')
-    end = request.args.get('end')
     tweetcount = len(response['tweets'])
-
-    if start == None:
-        start = 0
-    else:
-        start = int(start)
 
     if end == None:
         end = len(response['tweets'])
@@ -83,28 +89,14 @@ def getUserPosts(username):
     if end > len(response['tweets']):
         end = len(response['tweets'])
 
-    originalresponse = response
-
     response['tweets'] = response['tweets'][start:end]
 
-    extraend = end+10
-    if extraend > len(response['tweets']):
-        extraend = len(response['tweets'])
+    if (start > tweetcount) or (end >= tweetcount):
+        if firstscrape:
+            response = {"tweets": [{"tweet": "Still downloading content"}]}
+        else:
+            response['tweets'] = []
 
-    # print('1', originalresponse['tweets'][start:end])
-    # print('2', originalresponse['tweets'][start:extraend])
-
-    # for tweet in originalresponse['tweets'][start:extraend]:
-    #     print('tweet', tweet)
-    #     for photo in tweet['photos']:
-    #         print('photo', photo)
-    #         url = photo.split("/")[-1]
-    #         url = 'https://pbs.twimg.com/media/'+url
-    #         p = Process(target=downloadAndSavePhoto, args=(url,))
-    #         p.start()
-
-    if start > tweetcount:
-        response['tweets'] = []
     print("Sending response!")
 
     return response
@@ -118,6 +110,19 @@ def initialBackgroundScrape(username):
             json.dump(response, outfile)
             print("Saved "+datafolder+username.lower()+".json")
             scraping.remove(username)
+
+
+def checkAndUpdate(username, response):
+    # Check if there's an update to feed
+    latestPost = scrape(username.lower(), limit=1)
+
+    if latestPost['tweets'][0] not in response['tweets']:
+        print("Found new tweet!")
+        p = Process(target=initialBackgroundScrape,
+                    args=(username.lower(),))
+        p.start()
+    else:
+        print("Tweets are updated!")
 
 
 def downloadAndSavePhoto(photo):
@@ -144,11 +149,11 @@ def downloadAndSavePhoto(photo):
         print("Image already exists!")
 
 
-def scrape(username, full=True):
+def scrape(username, limit=None):
     # Configure
     c = twint.Config()
     c.Username = username
-    c.Proxy_host = "jp.torguard.com"
+    c.Proxy_host = getProxy()
     c.Proxy_port = 6060
     c.Proxy_type = "http"
     c.Proxy_Username = proxyuser
@@ -156,9 +161,7 @@ def scrape(username, full=True):
     c.Images = True
     c.Pandas = True
     c.Hide_output = True
-
-    if (not full):
-        c.Limit = 5
+    c.Limit = limit
 
     # Run
     print("Scraping from " + username + "'s twitter...")
@@ -200,69 +203,69 @@ def scrape(username, full=True):
 
 def getProxy():
     proxyList = [
-        "http://"+proxyuser+":"+proxypass+"@hk.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@id.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@jp.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@nz.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@sg.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@sg2.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@tw.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@au.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@au2.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@th.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@br.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@br2.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@ca.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@us-lv.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@ch.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@cavan.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@mx.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@us-atl.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@us-la.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@us-fl.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@us-dal.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@us-nj.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@us-ny.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@us-chi.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@us-lv.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@us-sf.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@us-sa.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@us-slc.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@aus.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@bg.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@bul.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@cz.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@dn.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@fn.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@fr.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@ger.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@gre.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@hg.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@ice.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@ire.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@it.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@lv.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@md.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@nl.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@no.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@pl.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@pg.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@ro.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@ru.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@slk.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@sp.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@swe.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@swiss.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@tk.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@ukr.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@uk.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@in.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@isr-loc1.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@sa.torguard.com:6060",
-        "http://"+proxyuser+":"+proxypass+"@uae.torguard.com:6060",
+        "hk.torguard.com",
+        "id.torguard.com",
+        "jp.torguard.com",
+        "nz.torguard.com",
+        "sg.torguard.com",
+        "sg2.torguard.com",
+        "tw.torguard.com",
+        "au.torguard.com",
+        "au2.torguard.com",
+        "th.torguard.com",
+        "br.torguard.com",
+        "br2.torguard.com",
+        "ca.torguard.com",
+        "us-lv.torguard.com",
+        "ch.torguard.com",
+        "cavan.torguard.com",
+        "mx.torguard.com",
+        "us-atl.torguard.com",
+        "us-la.torguard.com",
+        "us-fl.torguard.com",
+        "us-dal.torguard.com",
+        "us-nj.torguard.com",
+        "us-ny.torguard.com",
+        "us-chi.torguard.com",
+        "us-lv.torguard.com",
+        "us-sf.torguard.com",
+        "us-sa.torguard.com",
+        "us-slc.torguard.com",
+        "aus.torguard.com",
+        "bg.torguard.com",
+        "bul.torguard.com",
+        "cz.torguard.com",
+        "dn.torguard.com",
+        "fn.torguard.com",
+        "fr.torguard.com",
+        "ger.torguard.com",
+        "gre.torguard.com",
+        "hg.torguard.com",
+        "ice.torguard.com",
+        "ire.torguard.com",
+        "it.torguard.com",
+        "lv.torguard.com",
+        "md.torguard.com",
+        "nl.torguard.com",
+        "no.torguard.com",
+        "pl.torguard.com",
+        "pg.torguard.com",
+        "ro.torguard.com",
+        "ru.torguard.com",
+        "slk.torguard.com",
+        "sp.torguard.com",
+        "swe.torguard.com",
+        "swiss.torguard.com",
+        "tk.torguard.com",
+        "ukr.torguard.com",
+        "uk.torguard.com",
+        "in.torguard.com",
+        "isr-loc1.torguard.com",
+        "sa.torguard.com",
+        "uae.torguard.com",
     ]
 
     proxy_index = random.randint(0, len(proxyList) - 1)
-    proxy = {"https": proxyList[proxy_index]}
+    proxy = proxyList[proxy_index]
 
     return proxy

@@ -10,8 +10,8 @@ services:
         ports:
             - 5000:5000
         environment:
-            - PROXY_USER=User
-            - PROXY_PASS=Pass
+            - PROXY_USER=lewistham9x
+            - PROXY_PASS=kitties123
             - BASE_URL=https://api.twig.miim.club
         volumes:
             - ./static:/code/static

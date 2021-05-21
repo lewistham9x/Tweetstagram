@@ -11,7 +11,10 @@ import { NotificationComponent } from './components/notification/notification.co
 import { AuthGuardService } from './guards/auth-guard.service';
 import { AuthService } from './services/auth/auth.service';
 import { HttpService } from './services/http/http.service';
-import { InterceptorService } from './services/interceptor.service';
+import {
+	InterceptorService,
+	TimeoutInterceptorService,
+} from './services/interceptor.service';
 
 library.add(fas);
 
@@ -22,25 +25,30 @@ library.add(fas);
 		HttpClientModule,
 		FormsModule,
 		ReactiveFormsModule,
-		FontAwesomeModule
+		FontAwesomeModule,
 	],
 	providers: [
 		{
 			provide: HTTP_INTERCEPTORS,
 			useClass: InterceptorService,
-			multi: true
+			multi: true,
+		},
+		{
+			provide: HTTP_INTERCEPTORS,
+			useClass: TimeoutInterceptorService,
+			multi: true,
 		},
 		AuthService,
 		LoaderService,
 		AuthGuardService,
-		HttpService
+		HttpService,
 	],
 	entryComponents: [LoaderComponent],
 	exports: [
 		NotificationComponent,
 		FormsModule,
 		ReactiveFormsModule,
-		FontAwesomeModule
-	]
+		FontAwesomeModule,
+	],
 })
 export class CoreModule {}
