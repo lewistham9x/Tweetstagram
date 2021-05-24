@@ -3,14 +3,14 @@ import { Router } from '@angular/router';
 import {
 	faBookmark,
 	faCamera,
-	faUsers,
+	faUsers
 } from '@fortawesome/free-solid-svg-icons';
 import { HttpService } from '../../../core/services/http/http.service';
 
 @Component({
 	selector: 'ia-profile-gallery',
 	templateUrl: './profile-gallery.component.html',
-	styleUrls: ['./profile-gallery.component.scss'],
+	styleUrls: ['./profile-gallery.component.scss']
 })
 export class ProfileGalleryComponent implements OnInit {
 	isSelectedTab = 'Posts';
@@ -71,7 +71,7 @@ export class ProfileGalleryComponent implements OnInit {
 						}
 						this.index = this.index + 1;
 					},
-					(err) => {
+					err => {
 						console.log(err);
 						this.isLoading = false;
 					}

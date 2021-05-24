@@ -23,11 +23,6 @@ datafolder = "static/data/"
 
 scraping = []
 
-if not os.path.exists(imagefolder):
-    os.makedirs(imagefolder)
-if not os.path.exists(datafolder):
-    os.makedirs(datafolder)
-
 
 @app.route("/")
 @cross_origin(origin='*')
@@ -150,6 +145,12 @@ def downloadAndSavePhoto(photo):
 
 
 def scrape(username, limit=None):
+
+    if not os.path.exists(imagefolder):
+        os.makedirs(imagefolder)
+    if not os.path.exists(datafolder):
+        os.makedirs(datafolder)
+
     # Configure
     c = twint.Config()
     c.Username = username
@@ -158,7 +159,7 @@ def scrape(username, limit=None):
     c.Proxy_type = "http"
     c.Proxy_Username = proxyuser
     c.Proxy_Password = proxypass
-    c.Images = True
+    c.Media = True
     c.Pandas = True
     c.Hide_output = True
     c.Limit = limit
@@ -191,8 +192,16 @@ def scrape(username, limit=None):
 
         # tweets.append({"id": str(row["id"]), "created_at": str(
         #     row["created_at"]), "tweet": row["tweet"], "photos": photos})
+
+        if row["video"] == 0:
+            embed = requests.get(
+                f"https://publish.twitter.com/oembed?url=https://twitter.com/{username}/status/{row['id']}")
+            embed = embed.json()["html"]
+        else:
+            embed = ""
+
         tweets.append({"id": str(row["id"]), "created_at": str(
-            row["created_at"]), "tweet": row["tweet"], "photos": row["photos"]})
+            row["created_at"]), "tweet": row["tweet"], "photos": row["photos"], "video": embed})
 
     print("Converted dataframe!")
     return {
