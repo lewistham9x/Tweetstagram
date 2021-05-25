@@ -12,7 +12,6 @@ import { ProfilePageComponent } from './profile-page/profile-page.component';
 import { ProfileInfoComponent } from './profile-page/profile-info/profile-info.component';
 import { ProfileGalleryComponent } from './profile-page/profile-gallery/profile-gallery.component';
 import { PostsGridViewComponent } from './profile-page/posts-grid-view/posts-grid-view.component';
-import { NgxTweetModule } from 'ngx-tweet';
 @NgModule({
 	declarations: [
 		ProfileComponent,
@@ -21,11 +20,6 @@ import { NgxTweetModule } from 'ngx-tweet';
 		ProfileGalleryComponent,
 		PostsGridViewComponent
 	],
-	imports: [
-		CommonModule,
-		ProfileRoutingModule,
-		FontAwesomeModule,
-		NgxTweetModule
-	]
+	imports: [CommonModule, ProfileRoutingModule, FontAwesomeModule]
 })
 export class ProfileModule {}
