@@ -4,7 +4,7 @@
 			<img [src]="(item?.photos)[0]" />
 		</div>
 		<div *ngIf="item?.video != ''">
-			<ngx-tweet tweetId="item?.id"></ngx-tweet>
+			<div [innerHTML]="twttr.widgets.load(item?.video)"></div>
 		</div>
 	</div>
 </div>
